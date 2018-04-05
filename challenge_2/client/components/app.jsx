@@ -1,7 +1,9 @@
 import React from 'react';
+import axios from 'axios';
 import F1 from './F1';
 import F2 from './F2';
 import F3 from './F3';
+
 
 class App extends React.Component {
   constructor(props) {
@@ -46,7 +48,9 @@ class App extends React.Component {
 
   onSubmit(e) {
     e.preventDefault();
-    console.log(this.state);
+    axios.post('/api', this.state)
+      .then(response => console.log(response))
+      .catch(error => console.log(error));
   }
 
   render() {
