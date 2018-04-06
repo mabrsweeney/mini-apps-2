@@ -32,8 +32,22 @@ class App extends Component {
       this.revealBoard(x-1,y-1,newVis);
     } else if(tile > 0) {
       newVis[x][y] = true;
-    } if(tile === -1) console.log('Fuck you!');
+    } if(tile === -1) {
+      this.detonate();
+    }
     return newVis;
+  }
+
+  detonate() {
+    let newBoard = this.state.visBoard
+    for(let i = 1; i < 11; i++) {
+      for(let j = 1; j < 11; j++) {
+        if(this.state.board[i][j] === -1 && !newBoard[i][j])
+          newBoard[i][j] = true;
+      } 
+    }
+    this.setState(newBoard);
+    this.tileClick = () => {};
   }
 
   componentWillMount() {
