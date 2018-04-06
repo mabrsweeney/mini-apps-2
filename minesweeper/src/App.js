@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import BoardRow from './BoardRow';
+import Win from './Win';
 import './App.css';
 
 class App extends Component {
@@ -8,6 +9,7 @@ class App extends Component {
     this.state = {
       board: [],
       visBoard: [],
+      win: false,
     }
     this.tileClick = this.tileClick.bind(this);
     this.flag = this.flag.bind(this);
@@ -26,7 +28,21 @@ class App extends Component {
 
   tileClick(x,y) {
     let newBoard = this.revealBoard(x,y,this.state.visBoard);
+    this.checkWin(newBoard);
     this.setState({visBoard: newBoard});
+  }
+
+  checkWin(board) {
+    let count = 0;
+    for(let i = 1; i <= 10; i++) {
+      for(let j = 1; j <= 10; j++) {
+        if (board[i][j] === 0) count++;
+      }
+    }
+    console.log(board);
+    if(count === 10){
+      this.setState({win: true});
+    }
   }
 
   revealBoard(x,y,newVis) {
@@ -75,7 +91,7 @@ class App extends Component {
       visBoard.push(visRow.slice());
     }
     newBoard.push(buffer.slice());
-    for(let i = 0; i < 10; i++) {
+    for(let i = 0; i <= 10; i++) {
       let x = Math.floor(Math.random() * 10)+1;
       let y = Math.floor(Math.random() * 10)+1;
       while(newBoard[x][y] === 1) {
@@ -96,6 +112,7 @@ class App extends Component {
 
     this.tileClick = (x,y) => {
       let newBoard = this.revealBoard(x,y,this.state.visBoard);
+      this.checkWin(newBoard);
       this.setState({visBoard: newBoard});
     }
     this.flag = (x,y) => {
@@ -117,7 +134,7 @@ class App extends Component {
     return (<div>
       <div id="board-container">{this.state.board.map((row, idx) => {
         return <BoardRow key={idx} x={idx} row={row} vRow={this.state.visBoard[idx]} flag={this.flag} tileClick={this.tileClick}/>;
-      })}</div><button onClick={this.generateBoard}>Reset!</button></div>
+      })}</div><button onClick={this.generateBoard}>Reset!</button><Win hasWon={this.state.win}/></div>
     );
   }
 }
