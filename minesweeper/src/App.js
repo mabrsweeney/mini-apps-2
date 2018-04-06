@@ -16,32 +16,26 @@ class App extends Component {
     this.generateBoard = this.generateBoard.bind(this);
   }
 
-  flag(x,y) {
-    let newBoard = this.state.visBoard;
-    if (newBoard[x][y] === 0){
-      newBoard[x][y] = 2;
-    } else if(newBoard[x][y] === 2) {
-      newBoard[x][y] = 0;
-    }
-    this.setState({visBoard: newBoard});
-  }
-
-  tileClick(x,y) {
-    let newBoard = this.revealBoard(x,y,this.state.visBoard);
-    this.checkWin(newBoard);
-    this.setState({visBoard: newBoard});
-  }
+  flag(x,y) {}
+  tileClick(x,y) {}
 
   checkWin(board) {
-    let count = 0;
+    let emptyCount = 0;
+    let flagCount = 0;
+    let tileCount = 0;
     for(let i = 1; i <= 10; i++) {
       for(let j = 1; j <= 10; j++) {
-        if (board[i][j] === 0) count++;
+        if (board[i][j] === 1) emptyCount++;
+        if (board[i][j] === 2) flagCount++;
+        if (board[i][j] === 0) tileCount++;
       }
     }
     console.log(board);
-    if(count === 10){
+    console.log(flagCount);
+    if(emptyCount === 90 || (flagCount === 10 && tileCount === 0)){
       this.setState({win: true});
+      this.tileClick = () => {};
+      this.flag = () => {};
     }
   }
 
@@ -50,17 +44,12 @@ class App extends Component {
     const tile = this.state.board[x][y]
     newVis[x][y] = 1;
     if(tile === 0) {
-      this.revealBoard(x,y+1,newVis);
-      this.revealBoard(x,y-1,newVis);
-      this.revealBoard(x+1,y,newVis);
-      this.revealBoard(x+1,y+1,newVis);
-      this.revealBoard(x+1,y-1,newVis);
-      this.revealBoard(x-1,y,newVis);
-      this.revealBoard(x-1,y+1,newVis);
-      this.revealBoard(x-1,y-1,newVis);
+      for(let i = -1; i <= 1; i++)
+        for(let j = -1; j <= 1; j++)
+          this.revealBoard(x+i,y+j,newVis);
     } else if(tile > 0) {
       newVis[x][y] = 1;
-    } if(tile === -1) {
+    } else if(tile === -1) {
       this.detonate();
     }
     return newVis;
@@ -68,16 +57,14 @@ class App extends Component {
 
   detonate() {
     let newBoard = this.state.visBoard
-    for(let i = 1; i < 11; i++) {
-      for(let j = 1; j < 11; j++) {
+    for(let i = 1; i < 11; i++)
+      for(let j = 1; j < 11; j++)
         if(this.state.board[i][j] === -1 && !newBoard[i][j])
           newBoard[i][j] = 1;
-      } 
-    }
+
     this.setState(newBoard);
     this.tileClick = () => {};
     this.flag = () => {};
-
   }
 
   generateBoard() {
@@ -91,10 +78,10 @@ class App extends Component {
       visBoard.push(visRow.slice());
     }
     newBoard.push(buffer.slice());
-    for(let i = 0; i <= 10; i++) {
+    for(let i = 0; i < 10; i++) {
       let x = Math.floor(Math.random() * 10)+1;
       let y = Math.floor(Math.random() * 10)+1;
-      while(newBoard[x][y] === 1) {
+      while(newBoard[x][y] === -1) {
         x = Math.floor(Math.random() * 10)+1;
         y = Math.floor(Math.random() * 10)+1;
       }
@@ -108,7 +95,7 @@ class App extends Component {
             for(let j = -1; j <= 1; j++)
               if(newBoard[x+i][y+j] === -1) newBoard[x][y]++;
 
-    this.setState({board: newBoard, visBoard: visBoard});
+    this.setState({board: newBoard, visBoard: visBoard, win: false});
 
     this.tileClick = (x,y) => {
       let newBoard = this.revealBoard(x,y,this.state.visBoard);
