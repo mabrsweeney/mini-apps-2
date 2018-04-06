@@ -7,6 +7,8 @@
   background-color: red;
 }
 
-.empty {
-  background-color: white;
+.empty, .number {
+background: rgba(76, 175, 80, 0);
+border: none;
+outline: none;
 }
