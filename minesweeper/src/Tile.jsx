@@ -4,7 +4,7 @@ const Tile = (props) => {
   if(props.visible === 1 || props.tile === -2){
     switch(props.tile) {
       case 0:
-        return <button className="tile empty"></button>;
+        return <button className="tile empty" onContextMenu={(e) => {e.preventDefault()}}></button>;
       case -1:
         return <button className="tile mine"></button>;
       case -2:
