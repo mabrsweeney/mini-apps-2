@@ -40,6 +40,10 @@ class App extends React.Component {
     this.setState(formChange);
   }
 
+  shouldComponentUpdate(nextProps, ns) {
+   return (this.state.f1  !== ns.f1 || this.state.f2 !== ns.f2 || this.state.f3  !== ns.f3)
+  }
+
   onStringChange(e) {
     const newState = {};
     newState[e.target.id] = e.target.value;
@@ -54,6 +58,7 @@ class App extends React.Component {
   }
 
   render() {
+    console.log('rerendering');
     return (
       <div>
         <F1 next={this.next} display={this.state.f1} onStringChange={this.onStringChange}/>
