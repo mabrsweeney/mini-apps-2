@@ -10,6 +10,18 @@ class App extends Component {
       visBoard: [],
     }
     this.tileClick = this.tileClick.bind(this);
+    this.flag = this.flag.bind(this);
+    this.generateBoard = this.generateBoard.bind(this);
+  }
+
+  flag(x,y) {
+    let newBoard = this.state.visBoard;
+    if (newBoard[x][y] === 0){
+      newBoard[x][y] = 2;
+    } else if(newBoard[x][y] === 2) {
+      newBoard[x][y] = 0;
+    }
+    this.setState({visBoard: newBoard});
   }
 
   tileClick(x,y) {
@@ -20,7 +32,7 @@ class App extends Component {
   revealBoard(x,y,newVis) {
     if(newVis[x][y]) return newVis;
     const tile = this.state.board[x][y]
-    newVis[x][y] = true;
+    newVis[x][y] = 1;
     if(tile === 0) {
       this.revealBoard(x,y+1,newVis);
       this.revealBoard(x,y-1,newVis);
@@ -31,7 +43,7 @@ class App extends Component {
       this.revealBoard(x-1,y+1,newVis);
       this.revealBoard(x-1,y-1,newVis);
     } else if(tile > 0) {
-      newVis[x][y] = true;
+      newVis[x][y] = 1;
     } if(tile === -1) {
       this.detonate();
     }
@@ -43,17 +55,19 @@ class App extends Component {
     for(let i = 1; i < 11; i++) {
       for(let j = 1; j < 11; j++) {
         if(this.state.board[i][j] === -1 && !newBoard[i][j])
-          newBoard[i][j] = true;
+          newBoard[i][j] = 1;
       } 
     }
     this.setState(newBoard);
     this.tileClick = () => {};
+    this.flag = () => {};
+
   }
 
-  componentWillMount() {
+  generateBoard() {
     const buffer = [-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2];
     const newRow = [-2,0,0,0,0,0,0,0,0,0,0,-2];
-    const visRow = [false,false,false,false,false,false,false,false,false,false,false,false];
+    const visRow = [0,0,0,0,0,0,0,0,0,0,0,0];
     const newBoard = [buffer.slice()];
     const visBoard = [visRow.slice(), visRow.slice()];
     for(let i = 0; i < 10; i++) {
@@ -79,13 +93,31 @@ class App extends Component {
               if(newBoard[x+i][y+j] === -1) newBoard[x][y]++;
 
     this.setState({board: newBoard, visBoard: visBoard});
+
+    this.tileClick = (x,y) => {
+      let newBoard = this.revealBoard(x,y,this.state.visBoard);
+      this.setState({visBoard: newBoard});
+    }
+    this.flag = (x,y) => {
+      let newBoard = this.state.visBoard;
+      if (newBoard[x][y] === 0){
+        newBoard[x][y] = 2;
+      } else if(newBoard[x][y] === 2) {
+        newBoard[x][y] = 0;
+      }
+      this.setState({visBoard: newBoard});
+    }
+  }
+
+  componentWillMount() {
+    this.generateBoard();
   }
 
   render() {
-    return (
+    return (<div>
       <div id="board-container">{this.state.board.map((row, idx) => {
-        return <BoardRow key={idx} x={idx} row={row} vRow={this.state.visBoard[idx]} tileClick={this.tileClick}/>;
-      })}</div>
+        return <BoardRow key={idx} x={idx} row={row} vRow={this.state.visBoard[idx]} flag={this.flag} tileClick={this.tileClick}/>;
+      })}</div><button onClick={this.generateBoard}>Reset!</button></div>
     );
   }
 }
